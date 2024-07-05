@@ -1,4 +1,4 @@
-@extends('dashboard')
+@extends('index')
 
 @section('content')
     <h1>Panier :</h1>

@@ -1,9 +1,9 @@
-@extends('dashboard')
+@extends('index')
 
 @section("content")
 <div class="py-12">
     <ul class="grid grid-cols-3 gap-5">
-    @foreach($products as $product) 
+    @foreach($products as $product)
         <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <a href="#">
                 <img class="p-8 rounded-t-lg" src="{{ $product->image_path }}" alt="product image" />

@@ -7,9 +7,9 @@
             @endforeach
         </ul>
     </div>
-@endif  
+@endif
 
-@extends('dashboard')
+@extends('index')
 
 @section("content")
 <main class="mt-6" style="max-width: 1080px; margin:auto ">

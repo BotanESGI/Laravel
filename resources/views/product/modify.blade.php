@@ -7,9 +7,9 @@
             @endforeach
         </ul>
     </div>
-@endif 
+@endif
 
-@extends('dashboard')
+@extends('index')
 
 @section("content")
 <main class="mt-6" style="max-width: 1080px; margin:auto ">
@@ -49,7 +49,7 @@
                     <div class="mt-4 flex text-sm leading-6 text-gray-600">
                         <label for="image" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
                         <span>Upload a new file or drag and drop it</span>
-  
+
                         <input id="image" name="image" type="file" class="sr-only">
                         </label>
                     </div>
