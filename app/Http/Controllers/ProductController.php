@@ -19,46 +19,93 @@ class ProductController extends Controller
 
     public function create(): View
     {
-        return view ("product.create");
+        return view("product.create");
     }
 
-    public function createProduct(Request $request): RedirectResponse
+    public function createProduct(Request $request) : RedirectResponse
     {
+        // Validation des entrées
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'prix' => 'required|numeric',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
         $product = new Product;
-        
+
         $product->name = $request->name;
-        
         $product->description = $request->description;
-        
         $product->price = $request->prix;
-        
-        $product->image_path = $request->image;
 
-        // $request->validate([
-        //     'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
-        // ]);
+        if ($request->hasFile('image')) {
+            try {
+                $image = $request->file('image');
+                $name = time() . '.' . $image->getClientOriginalName();
+                $destinationPath = public_path('/images');
+                $image->move($destinationPath, $name);
 
+                // Enregistrer le chemin de l'image dans le produit
+                $product->image_path = '/images/' . $name;
 
-        if ($request->file('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            return back()
-                ->with('success','Image Uploaded successfully.')
-                ->with('image', $imagePath);
+            } catch (Exception $e) {
+                return back()->with('error', 'Erreur lors du téléchargement de l\'image : ' . $e->getMessage());
+            }
+        } else {
+            return back()->with('error', 'Aucun fichier image trouvé.');
         }
 
         $product->save();
 
-        return Redirect::route('product.index');
+        return redirect()->route('product.index')->with('success', 'Produit créé avec succès.');
     }
 
-    public function modifyProduct($id)
+
+    public function modifyProduct($id): View
     {
         $product = Product::find($id);
 
-        dd($product);
+        return view("product.modify", ["product" => $product]);
     }
 
-    public function deleteProduct($id)
+    public function updateProduct(Request $request, $id)
+    {
+        // Validation des entrées
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'prix' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $product = Product::findOrFail($id);
+
+        $product->name = $request->name;
+        $product->description = $request->description;
+        $product->price = $request->prix;
+
+        if ($request->hasFile('image')) {
+            try {
+                $image = $request->file('image');
+                $name = time() . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/images');
+                $image->move($destinationPath, $name);
+
+                // Enregistrer le chemin de l'image dans le produit
+                $product->image_path = '/images/' . $name;
+
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors du téléchargement de l\'image : ' . $e->getMessage());
+            }
+        }
+
+        $product->save();
+
+        return redirect()->route('product.index')->with('success', 'Produit mis à jour avec succès.');
+    }
+
+
+    public function deleteProduct($id) : RedirectResponse
         {
             // Trouver le produit par ID
             $product = Product::find($id);

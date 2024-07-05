@@ -1,3 +1,4 @@
+
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,10 +16,24 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+
+                    <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
+                        {{ __('Panier') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                        {{ __('Voir les articles') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('product.create')" :active="request()->routeIs('product.create')">
+                        {{ __('Ajouter des articles') }}
+                    </x-nav-link>
+
                 </div>
+
+
+
+
             </div>
 
             <!-- Settings Dropdown -->
@@ -73,7 +88,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }} 
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                {{ __('Nos produit') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
+                {{ __('Panier') }}
+            </x-responsive-nav-link>
         </div>
+
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">

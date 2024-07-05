@@ -18,8 +18,8 @@ Route::get('/dashboard', function () {
         Route::get('/create', [ProductController::class, 'create'])->name("product.create");
         Route::post('/create', [ProductController::class, 'createProduct'])->name("createProduct");
         Route::get("/modify/{id}", [ProductController::class, 'modifyProduct'])->name("product.modify");
+        Route::put("/update/{id}", [ProductController::class, 'updateProduct'])->name("product.update");
         Route::delete('/delete/{id}', [ProductController::class, 'deleteProduct'])->name('product.delete');
-
     });
 
 
