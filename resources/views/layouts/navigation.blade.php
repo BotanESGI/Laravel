@@ -80,10 +80,6 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                {{ __('Nos produit') }}
-            </x-responsive-nav-link>
-
             <x-responsive-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
                 {{ __('Panier') }}
             </x-responsive-nav-link>
