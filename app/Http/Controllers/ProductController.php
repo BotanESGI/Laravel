@@ -58,10 +58,22 @@ class ProductController extends Controller
         dd($product);
     }
 
-    public function deleteProduct(Request $request): RedirectResponse
-    {
-        $product = Product::findOrFail($request->id);
-        $product->delete();
-        return Redirect::route("product.index");
-    }
+    public function deleteProduct($id)
+        {
+            // Trouver le produit par ID
+            $product = Product::find($id);
+
+            // Vérifier si le produit existe
+            if ($product) {
+                // Supprimer le produit
+                $product->delete();
+
+                // Rediriger avec un message de succès
+                return redirect()->route('product.index')->with('success', 'Produit supprimé avec succès.');
+            } else {
+                // Rediriger avec un message d'erreur
+                return redirect()->route('product.index')->with('error', 'Produit non trouvé.');
+            }
+        }
+
 }

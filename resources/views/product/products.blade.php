@@ -62,7 +62,12 @@
                                     <img src="{{ $product->image_path }}" />
                                     <p>{{ $product->description }} </p>
                                     <p>{{ $product->price }} </p>
-                                    <form action><a href="{{ route('product.delete', $product->id) }}">Delete product</a>  </button>
+                                    
+                                    <form action="{{ route('product.delete', $product->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit">Delete product</button>
+                                    </form>
                                     <button> <a href="{{ route('product.modify', $product->id) }}">Modify product</a> </button>
                                 </li>
                             @endforeach
