@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use \App\Models\Product;
+use \App\Models\Cart;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\RedirectResponse;
@@ -110,12 +111,17 @@ class ProductController extends Controller
             // Trouver le produit par ID
             $product = Product::find($id);
 
+             $carts_unpaid = Cart::where('paid', 0)
+                ->where('fk_produit', $id)
+                ->with('product')
+                ->get(); // Execute the query to get results
+
             // Vérifier si le produit existe
             if ($product) {
-                // Supprimer le produit
-                $product->delete();
 
-                // Rediriger avec un message de succès
+                $product->delete();
+                $card_unpaid->delete();
+                
                 return redirect()->route('product.index')->with('success', 'Produit supprimé avec succès.');
             } else {
                 // Rediriger avec un message d'erreur
