@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('index');
 });
 
+Route::get('/index', function () {
+    return view('index');
+});
+
 //Route::get('/dashboard', function () {
   //  return view('dashboard');
 //})->middleware(['auth', 'verified'])->name('dashboard');
