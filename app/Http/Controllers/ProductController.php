@@ -13,7 +13,7 @@ class ProductController extends Controller
 {
     public function index(): View
     {
-        $products = Product::get();
+        $products = Product::all();
 
         return view('product.products', ['products' => $products]);
     }
@@ -62,12 +62,21 @@ class ProductController extends Controller
     }
 
 
-    public function modifyProduct($id): View
+    public function modifyProduct($id)
     {
         $product = Product::find($id);
 
-        return view("product.modify", ["product" => $product]);
+        if(!$product)
+        {
+            return redirect()->back()
+                ->withErrors("Erreur Produit non trouvé.");
+        }
+        else
+        {
+            return view("product.modify", ["product" => $product]);
+        }
     }
+
 
     public function updateProduct(Request $request, $id)
     {
@@ -106,27 +115,23 @@ class ProductController extends Controller
     }
 
 
-    public function deleteProduct($id) : RedirectResponse
-        {
-            // Trouver le produit par ID
-            $product = Product::find($id);
 
-             $carts_unpaid = Cart::where('paid', 0)
-                ->where('fk_produit', $id)
-                ->with('product')
-                ->get(); // Execute the query to get results
+public function deleteProduct($id) : RedirectResponse
+{
+    $product = Product::find($id);
 
-            // Vérifier si le produit existe
-            if ($product) {
 
-                $product->delete();
-                $card_unpaid->delete();
-                
-                return redirect()->route('product.index')->with('success', 'Produit supprimé avec succès.');
-            } else {
-                // Rediriger avec un message d'erreur
-                return redirect()->route('product.index')->with('error', 'Produit non trouvé.');
-            }
-        }
+    if(!$product)
+    {
+        return redirect()->back()
+            ->withErrors("Erreur Produit non trouvé.");
+    }
+    else
+    {
+        Cart::where('fk_product', $id)->delete();
+        $product->delete();
+        return redirect()->route('product.index')->with('success', 'Produit supprimé avec succès.');
+    }
+}
 
 }

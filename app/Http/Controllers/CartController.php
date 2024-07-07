@@ -3,12 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
+    public function AddProductCart(Request $request, $productId)
+    {
+        $product = Product::find($productId);
+        $quantity = $request->input('quantity');
+
+        $validator = Validator::make($request->all(), [
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors("Erreur sur la quantité")
+                ->withInput();
+        }
+
+        if(!$product)
+        {
+            return redirect()->back()
+                ->withErrors("Erreur Produit non trouvé.");
+        }
+
+        $user = Auth::user();
+
+        $cart = Cart::where('paid', 0)
+            ->where('fk_user', $user->id)
+            ->where('fk_product', $productId)
+            ->first();
+
+        if ($cart) {
+            $cart->update([
+                'quantity' => $cart->quantity + $quantity,
+            ]);
+        } else {
+            Cart::create([
+                'fk_user' => $user->id,
+                'fk_product' => $productId,
+                'quantity' => $quantity,
+                'paid' => 0,
+            ]);
+        }
+
+
+        return redirect()->route('cart.get')->with('success', 'Produit ajouté au panier avec succès.');
+    }
+
+
     public function getCart(): View
     {
         $user = Auth::user();
@@ -45,9 +93,16 @@ class CartController extends Controller
 
     public function removeProductCart($id)
     {
-        Cart::find($id)->delete();
-        return response()->json(['message' => 'Produit supprimé du panier avec succès']);
+        $cart = Cart::find($id);
+        if (!$cart) {
+            return response()->json(['error' => 'Produit non trouvé dans le panier.'], 404);
+        }
+        else {
+            $cart->delete();
+            return response()->json(['message' => 'Produit supprimé du panier avec succès']);
+        }
     }
+
 
     public function updateProductQuantity(Request $request, Cart $cart)
     {
