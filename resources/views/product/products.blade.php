@@ -20,6 +20,7 @@
                 </div>
             @endif
             <div style="display: flex; flex-wrap: wrap;">
+                @if (!$products->isEmpty())
                 @foreach($products as $product)
                     <div style="flex: 1 1 calc(25% - 16px); max-width: 300px; margin: 8px; box-sizing: border-box;">
                         <div class="card h-100 w-100" style="max-width: 100%; display: flex; flex-direction: column;">
@@ -51,6 +52,9 @@
                         </div>
                     </div>
                 @endforeach
+                @else
+                    <p>Aucun produit de disponible :(</p>
+                @endif
             </div>
         </div>
     </div>
