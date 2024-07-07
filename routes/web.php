@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{id}', [CartController::class, 'removeProductCart'])->name('cart.product.delete');
     Route::put('/cart/{cart}', [CartController::class, 'updateProductQuantity'])->name('cart.product.update');
     Route::post('/cart/{id}', [CartController::class, 'AddProductCart'])->name('cart.product.add');
+    Route::get('/transaction', [CartController::class, 'GetTransaction'])->name('transaction.history');
 });
 
 Route::middleware(['role.admin'])->group(function () {

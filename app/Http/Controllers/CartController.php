@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class CartController extends Controller
 {
@@ -66,7 +67,7 @@ class CartController extends Controller
             ->paginate(20);
 
         $totalPrice = $carts->sum(function($cart){
-            return $cart->product->price;
+            return $cart->product->price * $cart->quantity;
         });
 
         return view('cart.cart', ['carts' => $carts, 'totalPrice' => $totalPrice]);
@@ -75,14 +76,11 @@ class CartController extends Controller
     public function paidCart(): View
     {
         $user = Auth::user();
-
-        // Fetch unpaid carts for the current user
         $carts_unpaid = Cart::where('paid', 0)
             ->where('fk_user', $user->id)
             ->with('product')
-            ->get(); // Execute the query to get results
+            ->get();
 
-        // Update all fetched carts to mark them as paid
         foreach ($carts_unpaid as $cart_unpaid) {
             $cart_unpaid->paid = 1;
             $cart_unpaid->save();
@@ -90,6 +88,41 @@ class CartController extends Controller
 
         return view('cart.paid');
     }
+
+    public function GetTransaction(): View
+    {
+        $user = Auth::user();
+        $carts_paid = Cart::where('paid', 1)
+            ->where('fk_user', $user->id)
+            ->with('product')
+            ->get();
+
+        $TransactionsGrouped = $carts_paid->groupBy(function ($transaction) {
+            return $transaction->updated_at->format('Y-m-d H:i:s');
+        });
+
+        $TransactionsGroupedFinal = $TransactionsGrouped->map(function ($transactionsGroup) {
+            $totalPrice = $transactionsGroup->sum(function ($transaction) {
+                return $transaction->product->price * $transaction->quantity;
+            });
+
+            $totalQuantity = $transactionsGroup->sum('quantity');
+
+            return [
+                'transactions' => $transactionsGroup,
+                'totalPrice' => $totalPrice,
+                'totalQuantity' => $totalQuantity,
+                'formattedDate' => Carbon::parse($transactionsGroup->first()->updated_at)->format('F j, Y H:i:s')
+            ];
+        });
+
+        return view('cart.history', [
+            'groupedTransactions' => $TransactionsGroupedFinal
+        ]);
+    }
+
+
+
 
     public function removeProductCart($id)
     {
