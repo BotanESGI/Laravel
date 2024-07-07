@@ -12,8 +12,12 @@
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         @if(auth()->user()->role === 1)
                         <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                            {{ __('Back Office') }}
+                            {{ __('Nos Produits') }}
                         </x-nav-link>
+                        @else
+                            <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                                {{ __('Nos Produits') }}
+                            </x-nav-link>
                         @endif
 
                         <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
@@ -77,9 +81,13 @@
         <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
             <div class="pt-2 pb-3 space-y-1">
                 @if(auth()->user()->role === 1)
-                <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                    {{ __('Back Office') }}
-                </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                        {{ __('Nos Produits') }}
+                    </x-responsive-nav-link>
+                @else
+                    <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                        {{ __('Nos Produits') }}
+                    </x-responsive-nav-link>
                 @endif
 
                 <x-responsive-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
@@ -126,6 +134,10 @@
                     </div>
 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                                {{ __('Nos Produits') }}
+                            </x-nav-link>
+
                         <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
                             {{ __('Panier') }}
                         </x-nav-link>
@@ -144,6 +156,10 @@
         <!-- Responsive Navigation Menu -->
         <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
             <div class="pt-2 pb-3 space-y-1">
+                    <x-responsive-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                        {{ __('Nos Produits') }}
+                    </x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
                     {{ __('Panier') }}
                 </x-responsive-nav-link>
