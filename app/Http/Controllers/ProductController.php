@@ -15,7 +15,7 @@ class ProductController extends Controller
     {
         $products = Product::all();
 
-        return view('product.products', ['products' => $products]);
+        return view('product.index', ['products' => $products]);
     }
 
     public function create(): View
@@ -23,13 +23,27 @@ class ProductController extends Controller
         return view("product.create");
     }
 
+    public function show($name, $id): View
+    {
+        $product = Product::findOrFail($id);
+
+        if ($product->name !== $name){
+            abord(404);
+        }
+
+        return view("product.show", compact('product'));
+    }
+
+
     public function createProduct(Request $request) : RedirectResponse
     {
         // Validation des entrées
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string',
             'description' => 'required|string',
+            'category' => 'required|string',
             'prix' => 'required|numeric',
+            'stock' => 'required|numeric',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -38,6 +52,9 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->prix;
+        $product->stock = $request->stock;
+        $product->category = $request->category;
+
 
         if ($request->hasFile('image')) {
             try {
@@ -58,7 +75,7 @@ class ProductController extends Controller
 
         $product->save();
 
-        return redirect()->route('product.index')->with('success', 'Produit créé avec succès.');
+        return redirect()->route('dashboard.index')->with('success', 'Produit créé avec succès.');
     }
 
 
@@ -111,27 +128,27 @@ class ProductController extends Controller
 
         $product->save();
 
-        return redirect()->route('product.index')->with('success', 'Produit mis à jour avec succès.');
+        return redirect()->route('dashboard.index')->with('success', 'Produit mis à jour avec succès.');
     }
 
 
 
-public function deleteProduct($id) : RedirectResponse
-{
-    $product = Product::find($id);
-
-
-    if(!$product)
+    public function deleteProduct($id) : RedirectResponse
     {
-        return redirect()->back()
-            ->withErrors("Erreur Produit non trouvé.");
+        $product = Product::find($id);
+
+
+        if(!$product)
+        {
+            return redirect()->back()
+                ->withErrors("Erreur Produit non trouvé.");
+        }
+        else
+        {
+            Cart::where('fk_product', $id)->delete();
+            $product->delete();
+            return redirect()->route('dashboard.index')->with('success', 'Produit supprimé avec succès.');
+        }
     }
-    else
-    {
-        Cart::where('fk_product', $id)->delete();
-        $product->delete();
-        return redirect()->route('product.index')->with('success', 'Produit supprimé avec succès.');
-    }
-}
 
 }

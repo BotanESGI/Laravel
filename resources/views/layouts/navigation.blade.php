@@ -10,19 +10,16 @@
 
                     <!-- Navigation Links -->
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        @if(auth()->user()->role === 1)
                         <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                            {{ __('Nos Produits') }}
+                            {{ __('Articles') }}
                         </x-nav-link>
-                        @else
-                            <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                                {{ __('Nos Produits') }}
+
+                        @if(auth()->user()->role === 1)
+                            <x-nav-link :href="route('dashboard.index')" :active="request()->routeIs('dashboard.index')">
+                                {{ __('Dashboard') }}
                             </x-nav-link>
                         @endif
 
-                        <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
-                            {{ __('Panier') }}
-                        </x-nav-link>
 
                     </div>
 
@@ -36,7 +33,7 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                                <div>{{ Auth::user()->name }}</div>
+                                <div>{{ "My Account" }}</div>
 
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -48,11 +45,11 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
+                                {{ __('My Profile') }}
                             </x-dropdown-link>
 
-                            <x-dropdown-link :href="route('transaction.history')">
-                                {{ __('Historique des transactions') }}
+                            <x-dropdown-link :href="route('orders')">
+                                {{ __('My Orders') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -62,11 +59,19 @@
                                 <x-dropdown-link :href="route('logout')"
                                                  onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                    {{ __('Déconnexion') }}
+                                    {{ __('Log Out') }}
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
                     </x-dropdown>
+                    <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')" class="mr-2">
+                            <!-- <img src="/images/shopping-cart.svg" alt="shopping-cart" class="w-8 text-center"> -->
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none">
+                                <path stroke="currentColor" stroke-width="1.5" d="M8.25 8.25V6a2.25 2.25 0 012.25-2.25h3a2.25 2.25 0 110 4.5H3.75v8.25a3.75 3.75 0 003.75 3.75h9a3.75 3.75 0 003.75-3.75V8.25H17.5">
+                                </path>
+                                <p></p>
+                            </svg>
+                    </x-nav-link>
                 </div>
 
                 <!-- Hamburger -->
@@ -112,7 +117,7 @@
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
 
-                    <x-responsive-nav-link :href="route('transaction.history')">
+                    <x-responsive-nav-link :href="route('orders')">
                         {{ __('Historique des transactions') }}
                     </x-responsive-nav-link>
 
@@ -143,12 +148,9 @@
 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                                {{ __('Nos Produits') }}
+                                {{ __('Articles') }}
                             </x-nav-link>
 
-                        <x-nav-link :href="route('cart.get')" :active="request()->routeIs('cart.get')">
-                            {{ __('Panier') }}
-                        </x-nav-link>
                         <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                             {{ __('Connexion') }}
                         </x-nav-link>

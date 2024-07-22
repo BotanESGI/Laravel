@@ -10,9 +10,8 @@ class CreateCartsTable extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('fk_user')->constrained('users');
-            $table->foreignId('fk_product')->constrained('products');
-            $table->integer('quantity');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('status')->default('pending'); // Exemple: pending, paid, shipped
             $table->boolean('paid')->default(false);
             $table->timestamps();
         });

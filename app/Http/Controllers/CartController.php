@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,45 +17,48 @@ class CartController extends Controller
 {
     public function AddProductCart(Request $request, $productId)
     {
-        $product = Product::find($productId);
-        $quantity = $request->input('quantity');
-
-        $validator = Validator::make($request->all(), [
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors("Erreur sur la quantité")
-                ->withInput();
-        }
-
-        if(!$product)
-        {
-            return redirect()->back()
-                ->withErrors("Erreur Produit non trouvé.");
-        }
-
+        // Récupérer l'utilisateur authentifié
         $user = Auth::user();
+        $product = Product::find($productId);
 
+        if (!$product) {
+            return redirect()->back()->withErrors("Erreur Produit non trouvé.");
+        }
+
+        // pour que sa fonctionne sur toute les pages si dans $request y a pas de quantité alors c'est 1 sinon on met $request->quantity
+        $quantity = $request->quantity === null ? 1 : $request->quantity;
+
+        // Vérifier si le panier existe pour l'utilisateur
         $cart = Cart::where('paid', 0)
-            ->where('fk_user', $user->id)
-            ->where('fk_product', $productId)
+            ->where('user_id', $user->id)
+            ->first();
+        
+        // Si le panier n'existe pas, le créer
+        if (!$cart) {
+            $cart = Cart::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'paid' => 0
+            ]);
+        }
+
+        // Vérifier si l'article existe déjà dans le panier
+        $cartItem = CartItem::where('cart_id', $cart->id)
+            ->where('product_id', $productId)
             ->first();
 
-        if ($cart) {
-            $cart->update([
-                'quantity' => $cart->quantity + $quantity,
-            ]);
+        if ($cartItem) {
+            // Si l'article existe, mettre à jour la quantité
+            $cartItem->quantity += $quantity;
+            $cartItem->save();
         } else {
-            Cart::create([
-                'fk_user' => $user->id,
-                'fk_product' => $productId,
+            // Sinon, créer un nouvel article dans le panier
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $productId,
                 'quantity' => $quantity,
-                'paid' => 0,
             ]);
         }
-
 
         return redirect()->route('cart.get')->with('success', 'Produit ajouté au panier avec succès.');
     }
@@ -61,30 +67,67 @@ class CartController extends Controller
     public function getCart(): View
     {
         $user = Auth::user();
-        $carts = Cart::where('paid', 0)
-            ->where('fk_user', $user->id)
-            ->with('product')
-            ->paginate(20);
 
-        $totalPrice = $carts->sum(function($cart){
-            return $cart->product->price * $cart->quantity;
-        });
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-        return view('cart.cart', ['carts' => $carts, 'totalPrice' => $totalPrice]);
+        // Initialisation des variables
+        $cart = null;
+        $totalPrice = 0;
+        $items = collect();
+
+        $cart = Cart::where('paid', 0)
+            ->where('user_id', $user->id)
+            ->with('items.product')
+            ->first();
+
+        if ($cart){
+            // Calculer le prix total du panier
+            $totalPrice = $cart->items->sum(function($item) {
+                return $item->product->price * $item->quantity;
+            });
+            
+            $items = $cart->items;
+        }
+
+        // Récupérer tous les items du panier
+        return view('cart.cart', compact('cart', 'totalPrice', 'items'));
     }
 
-    public function paidCart(): View
+    public function paidCart(Request $request): View
     {
         $user = Auth::user();
-        $carts_unpaid = Cart::where('paid', 0)
-            ->where('fk_user', $user->id)
-            ->with('product')
-            ->get();
+        $totalPrice = $request->input('totalPrice');
 
-        foreach ($carts_unpaid as $cart_unpaid) {
-            $cart_unpaid->paid = 1;
-            $cart_unpaid->save();
+        $cart = Cart::where('paid', 0)
+            ->where('user_id', $user->id)
+            ->with('items.product')
+            ->first();
+
+        // Créer une nouvelle commande
+        $order = new Order();
+        $order->user_id = $user->id;
+        $order->status = 'Pre-order'; // ou tout autre statut approprié
+        $order->total = $totalPrice;
+        $order->save();
+
+        // Parcourir les paniers non payés et créer des éléments de commande
+        foreach ($cart->items as $item) {
+            $orderItem = new OrderItem();
+            $orderItem->order_id = $order->id;
+            $orderItem->product_id = $item->product->id;
+            $orderItem->quantity = $item->quantity;
+            $orderItem->price = $item->product->price;
+            $orderItem->save();
         }
+
+        // Supprimer les items du panier
+        foreach ($cart->items as $item) {
+        }
+
+        // Supprimer le panier
+        $cart->delete();
 
         return view('cart.paid');
     }
@@ -137,16 +180,28 @@ class CartController extends Controller
     }
 
 
-    public function updateProductQuantity(Request $request, Cart $cart)
+    public function updateProductQuantity(Request $request, $cartId)
     {
+
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $cart->quantity = $request->quantity;
-        $cart->save();
+        $quantity = $request->input('quantity');
+        $productId = $request->input('productId');
 
-        return response()->json(['success' => true]);
+        $cartItem = CartItem::where('cart_id', $cartId)
+            ->where('product_id', $productId)
+            ->first();
+
+
+        if ($cartItem) {
+            $cartItem->quantity = $quantity;
+            $cartItem->save();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 404);
     }
 
 }
