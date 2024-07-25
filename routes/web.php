@@ -9,6 +9,13 @@ use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CommentController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+});
+
+
 
 Route::get('/', [ProductController::class, 'index'])->name("product.index");
 Route::get('/{name}-{id}', [ProductController::class, 'show'])->name('product.show');
