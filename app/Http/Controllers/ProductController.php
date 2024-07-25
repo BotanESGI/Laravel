@@ -25,10 +25,11 @@ class ProductController extends Controller
 
     public function show($name, $id): View
     {
-        $product = Product::findOrFail($id);
+        //$product = Product::findOrFail($id);
+        $product = Product::with('comments.user')->findOrFail($id);
 
         if ($product->name !== $name){
-            abord(404);
+            abort(404);
         }
 
         return view("product.show", compact('product'));
