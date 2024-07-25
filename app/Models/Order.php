@@ -41,4 +41,12 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Obtenir les produits de cette commande via les items de commande.
+     */
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
+    }
 }

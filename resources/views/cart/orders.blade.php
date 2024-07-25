@@ -34,7 +34,7 @@
                             Total
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Action
+                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -53,6 +53,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <x-primary-button data-order-id="{{ $order->id }}" x-data="" x-on:click.prevent="openOrderModal({{ $order->id }})">{{ __('Détails') }}</x-primary-button>
+                                    <x-primary-button data-order-id="{{ $order->id }}" x-data="" x-on:click.prevent="downloadInvoice({{ $order->id }})">{{ __('Télécharger la Facture') }}</x-primary-button>
                                 </td>
                             </tr>
                         @endforeach
@@ -124,6 +125,10 @@
         // Ouvrir le modal
         const event = new CustomEvent('open-modal', { detail: 'detail-order' });
         window.dispatchEvent(event);
+    }
+
+    function downloadInvoice(orderId) {
+        window.open(`/invoice/${orderId}`, '_blank');
     }
 </script>
 
