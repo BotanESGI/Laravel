@@ -80,6 +80,19 @@
         <div class="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
             <p class="text-gray-700 dark:text-gray-300">{{ $comment->comment }}</p>
             <small class="text-gray-500 dark:text-gray-400">Par {{ $comment->user->name }} le {{ $comment->created_at->format('d/m/Y') }}</small>
+            <div class="flex items-center">
+                @for ($i = 1; $i <= 5; $i++)
+                    @if ($i <= $comment->rating)
+                        <svg class="w-4 h-4 text-yellow-500 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 15l-5.878 3.09 1.12-6.54L1 7.545l6.561-.954L10 1l2.439 5.591L19 7.545l-4.242 3.005 1.12 6.54z"/>
+                        </svg>
+                    @else
+                        <svg class="w-4 h-4 text-gray-400 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 15l-5.878 3.09 1.12-6.54L1 7.545l6.561-.954L10 1l2.439 5.591L19 7.545l-4.242 3.005 1.12 6.54z"/>
+                        </svg>
+                    @endif
+                @endfor
+            </div>
         </div>
     @endforeach
 
@@ -90,6 +103,16 @@
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <textarea name="comment" rows="4" class="w-full p-2 border rounded-lg dark:bg-gray-800 dark:text-gray-300" required></textarea>
+                <div class="flex items-center mt-2">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <label>
+                            <input type="radio" name="rating" value="{{ $i }}" class="sr-only">
+                            <svg class="w-6 h-6 cursor-pointer text-gray-400 hover:text-yellow-500 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 15l-5.878 3.09 1.12-6.54L1 7.545l6.561-.954L10 1l2.439 5.591L19 7.545l-4.242 3.005 1.12 6.54z"/>
+                            </svg>
+                        </label>
+                    @endfor
+                </div>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Ajouter</button>
             </form>
         </div>
