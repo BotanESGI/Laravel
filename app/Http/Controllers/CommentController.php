@@ -12,6 +12,7 @@ class CommentController extends Controller
         $request->validate([
             'comment' => 'required|string',
             'product_id' => 'required|exists:products,id',
+            'rating' => 'required|integer|min:1|max:5',
         ]);
 
         if (!auth()->check()) {
@@ -22,6 +23,7 @@ class CommentController extends Controller
         $comment->user_id = auth()->id();
         $comment->product_id = $request->product_id;
         $comment->comment = $request->comment;
+        $comment->rating = $request->rating;
         $comment->save();
 
         return redirect()->back()->with('success', 'Commentaire ajouté avec succès !');
