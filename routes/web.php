@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\InvoiceController;
 
 Route::get('/', [ProductController::class, 'index'])->name("product.index");
 Route::get('/{name}-{id}', [ProductController::class, 'show'])->name('product.show');
@@ -57,6 +58,7 @@ Route::middleware(['role.admin'])->group(function () {
 
 
 });
+Route::get('/invoice/{order}', [InvoiceController::class, 'generateInvoice'])->name('invoice.generate');
 
 
 require __DIR__.'/auth.php';
